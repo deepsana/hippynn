@@ -35,6 +35,7 @@ class MLIAPInterface(MLIAPUnified):
         element_types,
         ndescriptors=1,
         is_ensemble: bool = False,
+        extra_properties = None,
         model_device=torch.device("cpu"),
         compute_dtype=torch.float32,
         energy_unit: float = None,
@@ -44,6 +45,8 @@ class MLIAPInterface(MLIAPUnified):
         :param energy_node: Node for energy
         :param element_types: list of atomic symbols corresponding to element types
         :param ndescriptors: the number of descriptors to report to LAMMPS
+        :param is_ensemble: indicates whether an ensemble of models is used
+        :param extra_properties: dictionary of names to nodes for additional nodes for the calculator to compute
         :param model_device: the device to send torch data to (cpu or cuda)
         :param energy_unit: If present, multiply the result by the given energy units.
             If your model was trained in Hartree and your lammps script will operate in eV,
@@ -64,7 +67,7 @@ class MLIAPInterface(MLIAPUnified):
 
         # Build the calculator
         #if self.is_ensemble is True:
-        self.rcutfac, self.species_set, self.graph = setup_LAMMPS_graph(energy_node, is_ensemble)
+        self.rcutfac, self.species_set, self.graph = setup_LAMMPS_graph(energy_node, extra_properties, is_ensemble)
         
 
         self.nparams = sum(p.nelement() for p in self.graph.parameters())
@@ -189,9 +192,6 @@ class MLIAPInterface(MLIAPUnified):
         This function writes results to the input `data`.
         """
         
-        if self.is_ensemble:
-            data.uqflag = 1
-
         #print("in compute forces In lammps_interface/mliap_interface.py :: type(energy_node)", type(self.energy_node))
         # If there are no local atoms, do nothing
         nlocal = self.as_tensor(data.nlistatoms)

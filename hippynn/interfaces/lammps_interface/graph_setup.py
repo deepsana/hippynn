@@ -12,11 +12,11 @@ from ...graphs.nodes.physics import VecMag, GradientNode
 from ...graphs.nodes.tags import PairIndexer, Encoder
 
 
-def setup_LAMMPS_graph(energy, is_ensemble: bool):
+def setup_LAMMPS_graph(energy, extra_properties = None, is_ensemble: bool):
     """
 
     :param energy: energy node for lammp energy_stds interface
-    :param is_ensemble: boolean to check if it is an ensemble
+    :param is_ensemble: indicates whether ensemble of models is used
     :return: graph for computing from lammps MLIAP unified inputs.
     """
     
@@ -24,6 +24,9 @@ def setup_LAMMPS_graph(energy, is_ensemble: bool):
         required_nodes = [energy.mean, energy.std] 
     else: 
         required_nodes = [energy]
+
+    if extra_properties is not None:
+        required_nodes = required_nodes + list(extra_properties.values())
 
     why = "Generating LAMMPS Calculator interface"
     subgraph = get_subgraph(required_nodes)
@@ -102,7 +105,7 @@ def setup_LAMMPS_graph(energy, is_ensemble: bool):
     else:    
         local_atom_energy = LocalAtomExtractorNode("local_atom_energy", (atom_energies, in_nlocal))
     grad_rij = GradientNode("grad_rij", (local_atom_energy.total_local_value, in_pair_coord), -1)
-
+    print("grad_rji std:", grad_rij.std)
     implemented_nodes = local_atom_energy.local_atom_values, local_atom_energy.total_local_value, local_atom_energy_std.local_atom_values, grad_rij
 
     check_link_consistency((*new_inputs, *implemented_nodes))
