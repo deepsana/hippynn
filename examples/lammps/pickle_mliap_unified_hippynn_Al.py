@@ -17,12 +17,28 @@ if __name__ == "__main__":
     except FileNotFoundError:
         raise FileNotFoundError("Model not found, run ani_aluminum_example.py first!")
     
-    ensemble_graph, ensemble_info = make_ensemble(bundle) #added
+    graphs, ensemble_graph, ensemble_info = make_ensemble(bundle) #added
     ensemble_energy = ensemble_graph.node_from_name("ensemble_atomenergies") #added
-    ensemble_force = ensemble_graph.node_from_name("ensemble_force") #added
+    ensemble_force = ensemble_graph.node_from_name("ensemble_force") #addedi
+    ensemble_energy_all = ensemble_energy.all
+    
+    model_energy_nodes = []
 
+    for i, graph in enumerate(graphs):
+        energy_node = graph.node_from_name("atomenergies")
+        model_energy_nodes.append(energy_node)
+
+    print("model_energy_nodes:", model_energy_nodes)
+    print("model_energy_nodes[0]:", model_energy_nodes[0])
+
+
+    print("ensemble_energy:", ensemble_energy)
+    print("ensemble_force:", ensemble_force)
+    print("ensemble_energy_all:", ensemble_energy_all)
+    
+    extra_properties = {"model_energy_nodes": model_energy_nodes}
     #unified = MLIAPInterface(ensemble_energy, ["H", "C", "N", "O", "P", "S", "Cl"], model_device=device_fallback())
-    unified = MLIAPInterface(ensemble_energy, ["Al"],is_ensemble=True, model_device=device_fallback())
+    unified = MLIAPInterface(ensemble_energy, ["Al"],is_ensemble=True, extra_properties=extra_properties, model_device=device_fallback())
     #unified = MLIAPInterface(ensemble_energy.mean, ["Al"],is_ensemble=True, model_device=device_fallback())
     #unified = MLIAPInterface(energy_node, ["Al"], model_device=device_fallback())
     torch.save(unified, "mliap_unified_hippynn_Al.pt")

@@ -99,7 +99,7 @@ def make_ensemble(
 
     ensemble_graph = make_ensemble_graph(ensemble_inputs, ensemble_outputs)
 
-    return ensemble_graph, ensemble_info
+    return graphs, ensemble_graph, ensemble_info
 
 
 # TODO: Potentially move this function, or part of it, into experiment.serialization?

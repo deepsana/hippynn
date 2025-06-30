@@ -45,7 +45,7 @@ class MLIAPInterface(MLIAPUnified):
         :param energy_node: Node for energy
         :param element_types: list of atomic symbols corresponding to element types
         :param ndescriptors: the number of descriptors to report to LAMMPS
-        :param is_ensemble: indicates whether an ensemble of models is used
+        :param is_ensemble: indicates whether an ensemble of models is usedAdd commentMore actions
         :param extra_properties: dictionary of names to nodes for additional nodes for the calculator to compute
         :param model_device: the device to send torch data to (cpu or cuda)
         :param energy_unit: If present, multiply the result by the given energy units.
@@ -67,7 +67,7 @@ class MLIAPInterface(MLIAPUnified):
 
         # Build the calculator
         #if self.is_ensemble is True:
-        self.rcutfac, self.species_set, self.graph = setup_LAMMPS_graph(energy_node, extra_properties, is_ensemble)
+        self.rcutfac, self.species_set, self.graph = setup_LAMMPS_graph(energy_node, extra_properties=extra_properties, is_ensemble=is_ensemble)
         
 
         self.nparams = sum(p.nelement() for p in self.graph.parameters())
@@ -219,8 +219,9 @@ class MLIAPInterface(MLIAPUnified):
 
         # note your sign for rij might need to be +1 or -1, depending on how your implementation works
         inputs = [z_vals, pair_i, pair_j, -rij, nlocal]
-        atom_energy, total_energy, atom_energy_std, fij = self.graph(*inputs)
-
+        atom_energy, total_energy, atom_energy_std, fij, ensemble_fi_all, ensemble_fi_std = self.graph(*inputs)
+        print("ensemble_fi_all:", ensemble_fi_all)
+        print(f'ensemble_fi_std:{ensemble_fi_std}')
 
 
         # convert units
