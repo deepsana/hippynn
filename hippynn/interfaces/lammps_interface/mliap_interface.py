@@ -189,9 +189,6 @@ class MLIAPInterface(MLIAPUnified):
         This function writes results to the input `data`.
         """
         
-        if self.is_ensemble:
-            data.uqflag = 1
-
         #print("in compute forces In lammps_interface/mliap_interface.py :: type(energy_node)", type(self.energy_node))
         # If there are no local atoms, do nothing
         nlocal = self.as_tensor(data.nlistatoms)
